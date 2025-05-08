@@ -63,8 +63,29 @@ Many other applications at Voodoo will use consume this API.
 We are planning to put this project in production. According to you, what are the missing pieces to make this project production ready? 
 Please elaborate an action plan.
 
+According to me, here are some things that I'd think of before releasing this product in a production environment :
+- Authentication and rights management
+- More security (like validating payloads for example, or setting up a rate limiting logic)
+- More safety in the code (implementing tests, linter, prettier, ... to avoid making mistakes)
+- Real observability (more logs, more explicit ones, error management, alerting, ...)
+- I don't know if this use case would requires a cache system tbh
+- Environment variables and secrets management
+- I don't really know if SQLite is suitable for this use case (I guess if it's just for read operations on such amount of data, it should be fine) - but maybe it should be a good idea to create some indexes (once again, I'm not sure with this amount of data and this kind of app if this is really a priority)
+- Documentation (technical, product, ... with a Swagger, and a Notion to explain the product in detail)
+- CI/CD (with automated tests, linter, prettier, deployment, DB migrations if needed, ...)
+- I don't know if a dockerized environment is absolutely necessary, as we're using an in-memory database (it would have been if we were using a Postgres I guess)
+
 #### Question 2:
 Let's pretend our data team is now delivering new files every day into the S3 bucket, and our service needs to ingest those files
 every day through the populate API. Could you describe a suitable solution to automate this? Feel free to propose architectural changes.
 
+A suitable solution to automate would need :
+- a solution to trigger the action : As this files would be updated every day, I don't think an event based system is required. A CRON job should do the job, it's easier to implement and to maintain (the CRON could run every day at 5am for example, so the system isn't impacted)
+If this request takes too much time, there is a possibility that the CRON timed out. We could implement a queue system with a worker waiting for this to handle the job, but I think that the CRON won't time out as this is quite simple behavior (we're not saving 10 billions of items in the database).
+
+We would then have a CRON that trigger a small function (a Lambda or a Cloud function should be okay) that will fetch the S3 files, format it to our Game model and save it in the database.
+
+I thought about this solution with the current volumetry of data. If we need to save a lot more data, maybe I'd do some changed on the architecture. I would start benchmarking the database (is SQLite suitable ?), then I'd start benchmarking other part of the solution.
+First of all, I'd probably start checking the whole pipeline and try to identify where are the bottlenecks.
+I don't think creating a whole super awesome architecture is the perfect solution, if the product is basic and if a more "basic" architecture can handle what we want to do.
 
