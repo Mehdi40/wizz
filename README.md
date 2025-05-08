@@ -72,7 +72,7 @@ According to me, here are some things that I'd think of before releasing this pr
 - Environment variables and secrets management
 - I don't really know if SQLite is suitable for this use case (I guess if it's just for read operations on such amount of data, it should be fine) - but maybe it should be a good idea to create some indexes (once again, I'm not sure with this amount of data and this kind of app if this is really a priority)
 - Documentation (technical, product, ... with a Swagger, and a Notion to explain the product in detail)
-- CI/CD (with automated tests, linter, prettier, deployment, DB migrations if needed, ...)
+- CI/CD (with automated tests, linter, prettier, deployment (IaC like Terraform, Cloud Formation, ...), DB migrations if needed, ...)
 - I don't know if a dockerized environment is absolutely necessary, as we're using an in-memory database (it would have been if we were using a Postgres I guess)
 
 #### Question 2:
